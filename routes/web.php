@@ -2,6 +2,10 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\AdminController;
+
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -18,7 +22,7 @@ Route::middleware('auth')->group(function () {
 });
 
 
-Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+Route::prefix('admin')->middleware(['auth',])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
     Route::get('/companies', [AdminController::class, 'companies'])->name('admin.companies');
