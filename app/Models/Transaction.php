@@ -4,16 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Payout extends Model
+class Transaction extends Model
 {
     protected $fillable = [
         'user_id',
+        'transaction_type', // e.g., payment, withdrawal
         'amount',
-        'payout_date',
-        'status', // e.g., pending, paid, failed
+        'status', // success, failed, pending
+        'transaction_date',
+        'reference',
     ];
 
-    // A payout belongs to a user
+    // A transaction belongs to a user
     public function user()
     {
         return $this->belongsTo(User::class);
