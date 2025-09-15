@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Investment extends Model
 {
     protected $fillable = [
-        'user_id',
+        'regular_user_id',
         'company_id',
         'amount',
         'shares',
@@ -17,7 +17,7 @@ class Investment extends Model
     // An investment belongs to one user
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(RegularUser::class, 'regular_user_id');
     }
 
     // An investment belongs to one company

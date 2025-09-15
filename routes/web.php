@@ -6,11 +6,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CompanyController;
+use App\Http\Controllers\Admin\FraudController;
 use App\Http\Controllers\Admin\PayoutController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SettingController;
-use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\SupportController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserController;
 
@@ -64,10 +65,15 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     // Users and Referrals
     Route::get('users', [UserController::class, 'index'])->name('users.index');
+    Route::get('users/{id}', [UserController::class, 'show'])->name('users.show');
     Route::get('users/{id}/referrals', [UserController::class, 'referrals'])->name('users.referrals');
+    Route::put('users/{id}/status', [UserController::class, 'updateStatus'])->name('users.updateStatus');
 
     // Payouts and Transactions
     Route::get('payouts', [PayoutController::class, 'index'])->name('payouts.index');
+    Route::get('payouts/{id}', [PayoutController::class, 'show'])->name('payouts.show');
+    Route::put('payouts/{id}/status', [PayoutController::class, 'updateStatus'])->name('payouts.updateStatus');
+    Route::post('payouts/bulk-update', [PayoutController::class, 'bulkUpdate'])->name('payouts.bulkUpdate');
     Route::get('payments', [TransactionController::class, 'payments'])->name('payments');
     Route::get('failed-transactions', [TransactionController::class, 'failed'])->name('transactions.failed');
 
@@ -80,6 +86,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Settings
     Route::get('settings', [SettingController::class, 'index'])->name('settings');
     Route::post('settings/save', [SettingController::class, 'save'])->name('settings.save');
+
+    // Fraud Management
+    Route::resource('fraud', FraudController::class);
+
+    // Support Management
+    Route::resource('support', SupportController::class);
 });
 
 /*
@@ -87,7 +99,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 | Regular User Routes
 |--------------------------------------------------------------------------
 */
-
 Route::prefix('regular_user')->middleware(['auth:regular_user'])->name('regular_user.')->group(function () {
 
     // Dashboard
@@ -114,6 +125,23 @@ Route::prefix('regular_user')->middleware(['auth:regular_user'])->name('regular_
 
     // Help
     Route::get('help', [HelpController::class, 'index'])->name('help');
+    Route::post('help/submit', [HelpController::class, 'submit'])->name('help.submit'); // ✅ NEW
 });
+
+
+
+// Regular User Auth Routes
+Route::prefix('user')->name('regular_user.')->group(function () {
+    // Register
+    Route::get('register', [\App\Http\Controllers\RegularUser\Auth\RegisterController::class, 'showRegistrationForm'])->name('register');
+    Route::post('register', [\App\Http\Controllers\RegularUser\Auth\RegisterController::class, 'register']);
+
+    // Login
+    Route::get('login', [\App\Http\Controllers\RegularUser\Auth\LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('login', [\App\Http\Controllers\RegularUser\Auth\LoginController::class, 'login']);
+    Route::post('logout', [\App\Http\Controllers\RegularUser\Auth\LoginController::class, 'logout'])->name('logout');
+
+    });
+
 
 require __DIR__.'/auth.php';

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\RegularUser;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Transaction;
 
 class BalanceController extends Controller
 {
@@ -12,9 +12,14 @@ class BalanceController extends Controller
     {
         $user = Auth::guard('regular_user')->user();
 
-        // Assume balance is a property or relation
         $balance = $user->balance ?? 0;
 
-        return view('regular_user.balance.index', compact('balance'));
+        // Fetch the 5 most recent transactions (deposit, withdrawal, payout, etc.)
+        $transactions = $user->transactions()
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('regular_user.balance.index', compact('balance', 'transactions'));
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\Investment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -11,8 +12,19 @@ class CompanyController extends Controller
 {
     public function index()
     {
-        $companies = Company::all();
-        return view('admin.companies.index', compact('companies'));
+        $companies = Company::withCount('investments')
+            ->withSum('investments', 'amount')
+            ->withAvg('investments', 'amount')
+            ->get();
+        
+        $stats = [
+            'total_companies' => Company::count(),
+            'total_investments' => Investment::count(),
+            'total_investment_amount' => Investment::sum('amount'),
+            'average_investment' => Investment::avg('amount'),
+        ];
+        
+        return view('admin.companies.index', compact('companies', 'stats'));
     }
 
     public function create()
